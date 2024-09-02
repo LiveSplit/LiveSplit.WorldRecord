@@ -15,7 +15,10 @@ public class WorldRecordFactory : IComponentFactory
 
     public ComponentCategory Category => ComponentCategory.Information;
 
-    public IComponent Create(LiveSplitState state) => new WorldRecordComponent(state);
+    public IComponent Create(LiveSplitState state)
+    {
+        return new WorldRecordComponent(state);
+    }
 
     public string UpdateName => ComponentName;
 

@@ -395,5 +395,8 @@ public class WorldRecordComponent : IComponent
         Settings.SetSettings(settings);
     }
 
-    public int GetSettingsHashCode() => Settings.GetSettingsHashCode();
+    public int GetSettingsHashCode()
+    {
+        return Settings.GetSettingsHashCode();
+    }
 }
