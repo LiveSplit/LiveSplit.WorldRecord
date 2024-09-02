@@ -189,12 +189,13 @@ public class WorldRecordComponent : IComponent
 
             if (centeredText)
             {
-                var textList = new List<string>();
-
-                textList.Add(string.Format("World Record is {0} by {1}", formatted, runners));
-                textList.Add(string.Format("World Record: {0} by {1}", formatted, runners));
-                textList.Add(string.Format("WR: {0} by {1}", formatted, runners));
-                textList.Add(string.Format("WR is {0} by {1}", formatted, runners));
+                var textList = new List<string>
+                {
+                    string.Format("World Record is {0} by {1}", formatted, runners),
+                    string.Format("World Record: {0} by {1}", formatted, runners),
+                    string.Format("WR: {0} by {1}", formatted, runners),
+                    string.Format("WR is {0} by {1}", formatted, runners)
+                };
 
                 if (tieCount > 1)
                 {
