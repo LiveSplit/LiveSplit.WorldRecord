@@ -106,8 +106,8 @@ public class WorldRecordComponent : IComponent
                     });
                 }
 
-                var regionFilter = Settings.FilterRegion && State.Run.Metadata.Region != null ? State.Run.Metadata.Region.ID : null;
-                var platformFilter = Settings.FilterPlatform && State.Run.Metadata.Platform != null ? State.Run.Metadata.Platform.ID : null;
+                string regionFilter = Settings.FilterRegion && State.Run.Metadata.Region != null ? State.Run.Metadata.Region.ID : null;
+                string platformFilter = Settings.FilterPlatform && State.Run.Metadata.Platform != null ? State.Run.Metadata.Platform.ID : null;
                 EmulatorsFilter emulatorFilter = EmulatorsFilter.NotSet;
                 if (Settings.FilterPlatform)
                 {
@@ -121,9 +121,9 @@ public class WorldRecordComponent : IComponent
                     }
                 }
 
-                var timingMethodFilter = GetTimingMethodOverride();
+                SpeedrunComSharp.TimingMethod? timingMethodFilter = GetTimingMethodOverride();
 
-                var leaderboard = Client.Leaderboards.GetLeaderboardForFullGameCategory(State.Run.Metadata.Game.ID, State.Run.Metadata.Category.ID,
+                Leaderboard leaderboard = Client.Leaderboards.GetLeaderboardForFullGameCategory(State.Run.Metadata.Game.ID, State.Run.Metadata.Category.ID,
                     top: 1,
                     platformId: platformFilter, regionId: regionFilter,
                     emulatorsFilter: emulatorFilter, variableFilters: variableFilter, orderBy: timingMethodFilter);
@@ -146,13 +146,13 @@ public class WorldRecordComponent : IComponent
 
     private void ShowWorldRecord(LayoutMode mode)
     {
-        var centeredText = Settings.CenteredText && !Settings.Display2Rows && mode == LayoutMode.Vertical;
+        bool centeredText = Settings.CenteredText && !Settings.Display2Rows && mode == LayoutMode.Vertical;
         if (WorldRecord != null)
         {
-            var timingMethodOverride = GetTimingMethodOverride();
-            var time = GetWorldRecordTime(timingMethodOverride);
-            var timingMethod = State.CurrentTimingMethod;
-            var game = State.Run.Metadata.Game;
+            SpeedrunComSharp.TimingMethod? timingMethodOverride = GetTimingMethodOverride();
+            TimeSpan? time = GetWorldRecordTime(timingMethodOverride);
+            Model.TimingMethod timingMethod = State.CurrentTimingMethod;
+            Game game = State.Run.Metadata.Game;
             if (game != null)
             {
                 if (timingMethodOverride != null)
@@ -167,19 +167,19 @@ public class WorldRecordComponent : IComponent
                 LocalTimeFormatter.Accuracy = game.Ruleset.ShowMilliseconds ? TimeAccuracy.Milliseconds : TimeAccuracy.Seconds;
             }
 
-            var formatted = TimeFormatter.Format(time);
-            var isLoggedIn = SpeedrunCom.Client.IsAccessTokenValid;
-            var userName = string.Empty;
+            string formatted = TimeFormatter.Format(time);
+            bool isLoggedIn = SpeedrunCom.Client.IsAccessTokenValid;
+            string userName = string.Empty;
             if (isLoggedIn)
             {
                 userName = SpeedrunCom.Client.Profile.Name;
             }
 
-            var runners = string.Join(", ", AllTies.Select(t => string.Join(" & ", t.Players.Select(p =>
+            string runners = string.Join(", ", AllTies.Select(t => string.Join(" & ", t.Players.Select(p =>
                 isLoggedIn && p.Name == userName ? "me" : p.Name))));
-            var tieCount = AllTies.Count;
+            int tieCount = AllTies.Count;
 
-            var finalTime = GetPBTime(timingMethod);
+            TimeSpan? finalTime = GetPBTime(timingMethod);
             if (IsPBTimeLower(finalTime, time, game != null && game.Ruleset.ShowMilliseconds))
             {
                 formatted = LocalTimeFormatter.Format(finalTime);
@@ -263,9 +263,9 @@ public class WorldRecordComponent : IComponent
 
     private TimeSpan? GetPBTime(Model.TimingMethod method)
     {
-        var lastSplit = State.Run.Last();
-        var pbTime = lastSplit.PersonalBestSplitTime[method];
-        var splitTime = lastSplit.SplitTime[method];
+        ISegment lastSplit = State.Run.Last();
+        TimeSpan? pbTime = lastSplit.PersonalBestSplitTime[method];
+        TimeSpan? splitTime = lastSplit.SplitTime[method];
 
         if (State.CurrentPhase == TimerPhase.Ended && splitTime < pbTime)
         {
