@@ -93,10 +93,14 @@ public class WorldRecordComponent : IComponent
                     variableFilter = State.Run.Metadata.VariableValues.Values.Where(value =>
                     {
                         if (value == null)
+                        {
                             return false;
+                        }
 
                         if (value.Variable.IsSubcategory)
+                        {
                             return Settings.FilterSubcategories;
+                        }
 
                         return Settings.FilterVariables;
                     });
@@ -108,10 +112,15 @@ public class WorldRecordComponent : IComponent
                 if (Settings.FilterPlatform)
                 {
                     if (State.Run.Metadata.UsesEmulator)
+                    {
                         emulatorFilter = EmulatorsFilter.OnlyEmulators;
+                    }
                     else
+                    {
                         emulatorFilter = EmulatorsFilter.NoEmulators;
+                    }
                 }
+
                 var timingMethodFilter = GetTimingMethodOverride();
 
                 var leaderboard = Client.Leaderboards.GetLeaderboardForFullGameCategory(State.Run.Metadata.Game.ID, State.Run.Metadata.Category.ID,
@@ -147,9 +156,13 @@ public class WorldRecordComponent : IComponent
             if (game != null)
             {
                 if (timingMethodOverride != null)
+                {
                     timingMethod = timingMethodOverride.Value.ToLiveSplitTimingMethod();
+                }
                 else
+                {
                     timingMethod = game.Ruleset.DefaultTimingMethod.ToLiveSplitTimingMethod();
+                }
 
                 LocalTimeFormatter.Accuracy = game.Ruleset.ShowMilliseconds ? TimeAccuracy.Milliseconds : TimeAccuracy.Seconds;
             }
@@ -158,7 +171,9 @@ public class WorldRecordComponent : IComponent
             var isLoggedIn = SpeedrunCom.Client.IsAccessTokenValid;
             var userName = string.Empty;
             if (isLoggedIn)
+            {
                 userName = SpeedrunCom.Client.Profile.Name;
+            }
 
             var runners = string.Join(", ", AllTies.Select(t => string.Join(" & ", t.Players.Select(p =>
                 isLoggedIn && p.Name == userName ? "me" : p.Name))));
@@ -233,9 +248,15 @@ public class WorldRecordComponent : IComponent
     private bool IsPBTimeLower(TimeSpan? pbTime, TimeSpan? recordTime, bool showMillis)
     {
         if (pbTime == null || recordTime == null)
+        {
             return false;
+        }
+
         if (showMillis)
+        {
             return (int)pbTime.Value.TotalMilliseconds <= (int)recordTime.Value.TotalMilliseconds;
+        }
+
         return (int)pbTime.Value.TotalSeconds <= (int)recordTime.Value.TotalSeconds;
     }
 
@@ -246,29 +267,50 @@ public class WorldRecordComponent : IComponent
         var splitTime = lastSplit.SplitTime[method];
 
         if (State.CurrentPhase == TimerPhase.Ended && splitTime < pbTime)
+        {
             return splitTime;
+        }
+
         return pbTime;
     }
 
     private TimeSpan? GetWorldRecordTime(SpeedrunComSharp.TimingMethod? timingMethodOverride)
     {
         if (timingMethodOverride == SpeedrunComSharp.TimingMethod.RealTime)
+        {
             return WorldRecord.Times.RealTime;
+        }
+
         if (timingMethodOverride == SpeedrunComSharp.TimingMethod.RealTimeWithoutLoads)
+        {
             return WorldRecord.Times.RealTimeWithoutLoads;
+        }
+
         if (timingMethodOverride == SpeedrunComSharp.TimingMethod.GameTime)
+        {
             return WorldRecord.Times.GameTime;
+        }
+
         return WorldRecord.Times.Primary;
     }
 
     private SpeedrunComSharp.TimingMethod? GetTimingMethodOverride()
     {
         if (Settings.TimingMethod == "Real Time")
+        {
             return SpeedrunComSharp.TimingMethod.RealTime;
+        }
+
         if (Settings.TimingMethod == "Real Time Without Loads")
+        {
             return SpeedrunComSharp.TimingMethod.RealTimeWithoutLoads;
+        }
+
         if (Settings.TimingMethod == "Game Time")
+        {
             return SpeedrunComSharp.TimingMethod.GameTime;
+        }
+
         return null;
     }
 
@@ -314,8 +356,8 @@ public class WorldRecordComponent : IComponent
     private void DrawBackground(Graphics g, LiveSplitState state, float width, float height)
     {
         if (Settings.BackgroundColor.A > 0
-            || Settings.BackgroundGradient != GradientType.Plain
-            && Settings.BackgroundColor2.A > 0)
+            || (Settings.BackgroundGradient != GradientType.Plain
+            && Settings.BackgroundColor2.A > 0))
         {
             var gradientBrush = new LinearGradientBrush(
                         new PointF(0, 0),

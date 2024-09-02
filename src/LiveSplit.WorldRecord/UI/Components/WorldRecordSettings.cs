@@ -95,6 +95,7 @@ public partial class WorldRecordSettings : UserControl
             chkTwoRows.DataBindings.Clear();
             chkTwoRows.DataBindings.Add("Checked", this, "Display2Rows", false, DataSourceUpdateMode.OnPropertyChanged);
         }
+
         chkTwoRows_CheckedChanged(null, null);
     }
 
