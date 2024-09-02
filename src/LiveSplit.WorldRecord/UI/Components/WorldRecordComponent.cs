@@ -180,7 +180,7 @@ public class WorldRecordComponent : IComponent
             var tieCount = AllTies.Count;
 
             var finalTime = GetPBTime(timingMethod);
-            if (IsPBTimeLower(finalTime, time, game != null ? game.Ruleset.ShowMilliseconds : false))
+            if (IsPBTimeLower(finalTime, time, game != null && game.Ruleset.ShowMilliseconds))
             {
                 formatted = LocalTimeFormatter.Format(finalTime);
                 runners = State.Run.Metadata.Category.Players.Value > 1 ? "us" : "me";
