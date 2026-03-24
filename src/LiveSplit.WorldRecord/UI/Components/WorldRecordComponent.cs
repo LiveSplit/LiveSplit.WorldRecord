@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 
+using LiveSplit.Localization;
 using LiveSplit.Model;
 using LiveSplit.Options;
 using LiveSplit.TimeFormatters;
@@ -21,6 +22,8 @@ namespace LiveSplit.WorldRecord.UI.Components;
 
 public class WorldRecordComponent : IComponent
 {
+    private static string T(string source) => UiLocalizer.Translate(source, LanguageResolver.ResolveCurrentCultureLanguage());
+
     protected InfoTextComponent InternalComponent { get; set; }
 
     protected WorldRecordSettings Settings { get; set; }
@@ -36,7 +39,7 @@ public class WorldRecordComponent : IComponent
     private bool IsLoading { get; set; }
     private SpeedrunComClient Client { get; set; }
 
-    public string ComponentName => "World Record";
+    public string ComponentName => T("World Record");
 
     public float PaddingTop => InternalComponent.PaddingTop;
     public float PaddingLeft => InternalComponent.PaddingLeft;
@@ -63,7 +66,7 @@ public class WorldRecordComponent : IComponent
             Accuracy = TimeAccuracy.Milliseconds
         };
         PBTimeFormatter = new RegularTimeFormatter();
-        InternalComponent = new InfoTextComponent("World Record", TimeFormatConstants.DASH);
+        InternalComponent = new InfoTextComponent(T("World Record"), TimeFormatConstants.DASH);
         Settings = new WorldRecordSettings()
         {
             CurrentState = state
@@ -204,18 +207,18 @@ public class WorldRecordComponent : IComponent
             {
                 var textList = new List<string>
                 {
-                    string.Format("World Record is {0} by {1}", formatted, runners),
-                    string.Format("World Record: {0} by {1}", formatted, runners),
-                    string.Format("WR: {0} by {1}", formatted, runners),
-                    string.Format("WR is {0} by {1}", formatted, runners)
+                    string.Format(T("World Record is {0} by {1}"), formatted, runners),
+                    string.Format(T("World Record: {0} by {1}"), formatted, runners),
+                    string.Format(T("WR: {0} by {1}"), formatted, runners),
+                    string.Format(T("WR is {0} by {1}"), formatted, runners)
                 };
 
                 if (tieCount > 1)
                 {
-                    textList.Add(string.Format("World Record is {0} ({1}-way tie)", formatted, tieCount));
-                    textList.Add(string.Format("World Record: {0} ({1}-way tie)", formatted, tieCount));
-                    textList.Add(string.Format("WR: {0} ({1}-way tie)", formatted, tieCount));
-                    textList.Add(string.Format("WR is {0} ({1}-way tie)", formatted, tieCount));
+                    textList.Add(string.Format(T("World Record is {0} ({1}-way tie)"), formatted, tieCount));
+                    textList.Add(string.Format(T("World Record: {0} ({1}-way tie)"), formatted, tieCount));
+                    textList.Add(string.Format(T("WR: {0} ({1}-way tie)"), formatted, tieCount));
+                    textList.Add(string.Format(T("WR is {0} ({1}-way tie)"), formatted, tieCount));
                 }
 
                 InternalComponent.InformationName = textList.First();
@@ -225,11 +228,11 @@ public class WorldRecordComponent : IComponent
             {
                 if (tieCount > 1)
                 {
-                    InternalComponent.InformationValue = string.Format("{0} ({1}-way tie)", formatted, tieCount);
+                    InternalComponent.InformationValue = string.Format(T("{0} ({1}-way tie)"), formatted, tieCount);
                 }
                 else
                 {
-                    InternalComponent.InformationValue = string.Format("{0} by {1}", formatted, runners);
+                    InternalComponent.InformationValue = string.Format(T("{0} by {1}"), formatted, runners);
                 }
             }
         }
@@ -237,20 +240,20 @@ public class WorldRecordComponent : IComponent
         {
             if (centeredText)
             {
-                InternalComponent.InformationName = "Loading World Record...";
-                InternalComponent.AlternateNameText = new[] { "Loading WR..." };
+                InternalComponent.InformationName = T("Loading World Record...");
+                InternalComponent.AlternateNameText = new[] { T("Loading WR...") };
             }
             else
             {
-                InternalComponent.InformationValue = "Loading...";
+                InternalComponent.InformationValue = T("Loading...");
             }
         }
         else
         {
             if (centeredText)
             {
-                InternalComponent.InformationName = "Unknown World Record";
-                InternalComponent.AlternateNameText = new[] { "Unknown WR" };
+                InternalComponent.InformationName = T("Unknown World Record");
+                InternalComponent.AlternateNameText = new[] { T("Unknown WR") };
             }
             else
             {
