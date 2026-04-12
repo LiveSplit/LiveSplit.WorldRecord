@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -20,6 +20,7 @@ using SpeedrunComSharp;
 
 namespace LiveSplit.WorldRecord.UI.Components;
 
+[GlobalFontConsumer(GlobalFont.TextFont)]
 public class WorldRecordComponent : IComponent
 {
     private static string T(string source) => UiLocalizer.Translate(source, LanguageResolver.ResolveCurrentCultureLanguage());
