@@ -1,4 +1,4 @@
-namespace LiveSplit.UI;
+﻿namespace LiveSplit.UI;
 
 public enum WorldRecordPrecisionType
 {

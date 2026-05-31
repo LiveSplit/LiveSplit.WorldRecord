@@ -1,3 +1,11 @@
+﻿using LiveSplit.Localization;
+using LiveSplit.Model;
+using LiveSplit.Options;
+using LiveSplit.TimeFormatters;
+using LiveSplit.UI;
+using LiveSplit.UI.Components;
+using LiveSplit.Web.Share;
+using SpeedrunComSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,16 +15,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
-
-using LiveSplit.Localization;
-using LiveSplit.Model;
-using LiveSplit.Options;
-using LiveSplit.TimeFormatters;
-using LiveSplit.UI;
-using LiveSplit.UI.Components;
-using LiveSplit.Web.Share;
-
-using SpeedrunComSharp;
 
 namespace LiveSplit.WorldRecord.UI.Components;
 
@@ -86,8 +84,7 @@ public class WorldRecordComponent : IComponent
 
         try
         {
-            if (State != null && State.Run != null
-                && State.Run.Metadata.Game != null && State.Run.Metadata.Category != null)
+            if (State?.Run?.Metadata is { Game: not null, Category: not null })
             {
                 IEnumerable<VariableValue> variableFilter = null;
                 if (Settings.FilterVariables || Settings.FilterSubcategories)
@@ -113,14 +110,7 @@ public class WorldRecordComponent : IComponent
                 EmulatorsFilter emulatorFilter = EmulatorsFilter.NotSet;
                 if (Settings.FilterPlatform)
                 {
-                    if (State.Run.Metadata.UsesEmulator)
-                    {
-                        emulatorFilter = EmulatorsFilter.OnlyEmulators;
-                    }
-                    else
-                    {
-                        emulatorFilter = EmulatorsFilter.NoEmulators;
-                    }
+                    emulatorFilter = State.Run.Metadata.UsesEmulator ? EmulatorsFilter.OnlyEmulators : EmulatorsFilter.NoEmulators;
                 }
 
                 SpeedrunComSharp.TimingMethod? timingMethodFilter = GetTimingMethodOverride();
@@ -157,17 +147,12 @@ public class WorldRecordComponent : IComponent
             Game game = State.Run.Metadata.Game;
             if (game != null)
             {
-                if (timingMethodOverride != null)
-                {
-                    timingMethod = timingMethodOverride.Value.ToLiveSplitTimingMethod();
-                }
-                else
-                {
-                    timingMethod = game.Ruleset.DefaultTimingMethod.ToLiveSplitTimingMethod();
-                }
-                
-                var isMillisecondsPrecision = CheckPrecisionMillis(wrTime);
-                if(Settings.WRPrecision == WorldRecordPrecisionType.FromLeaderboard)
+                timingMethod = timingMethodOverride != null
+                    ? timingMethodOverride.Value.ToLiveSplitTimingMethod()
+                    : game.Ruleset.DefaultTimingMethod.ToLiveSplitTimingMethod();
+
+                bool isMillisecondsPrecision = CheckPrecisionMillis(wrTime);
+                if (Settings.WRPrecision == WorldRecordPrecisionType.FromLeaderboard)
                 {
                     PBTimeFormatter.AutomaticPrecision = true;
                     WRTimeFormatter.AutomaticPrecision = true;
@@ -222,19 +207,14 @@ public class WorldRecordComponent : IComponent
                     textList.Add(string.Format(T("WR is {0} ({1}-way tie)"), formatted, tieCount));
                 }
 
-                InternalComponent.InformationName = textList.First();
+                InternalComponent.InformationName = textList[0];
                 InternalComponent.AlternateNameText = textList;
             }
             else
             {
-                if (tieCount > 1)
-                {
-                    InternalComponent.InformationValue = string.Format(T("{0} ({1}-way tie)"), formatted, tieCount);
-                }
-                else
-                {
-                    InternalComponent.InformationValue = string.Format(T("{0} by {1}"), formatted, runners);
-                }
+                InternalComponent.InformationValue = tieCount > 1
+                    ? string.Format(T("{0} ({1}-way tie)"), formatted, tieCount)
+                    : string.Format(T("{0} by {1}"), formatted, runners);
             }
         }
         else if (IsLoading)
@@ -242,7 +222,7 @@ public class WorldRecordComponent : IComponent
             if (centeredText)
             {
                 InternalComponent.InformationName = T("Loading World Record...");
-                InternalComponent.AlternateNameText = new[] { T("Loading WR...") };
+                InternalComponent.AlternateNameText = [T("Loading WR...")];
             }
             else
             {
@@ -254,7 +234,7 @@ public class WorldRecordComponent : IComponent
             if (centeredText)
             {
                 InternalComponent.InformationName = T("Unknown World Record");
-                InternalComponent.AlternateNameText = new[] { T("Unknown WR") };
+                InternalComponent.AlternateNameText = [T("Unknown WR")];
             }
             else
             {
@@ -265,9 +245,9 @@ public class WorldRecordComponent : IComponent
 
     private bool CheckPrecisionMillis(TimeSpan? recordTime)
     {
-        if(Settings.WRPrecision == WorldRecordPrecisionType.FromLeaderboard)
+        if (Settings.WRPrecision == WorldRecordPrecisionType.FromLeaderboard)
         {
-            if(!recordTime.HasValue)
+            if (!recordTime.HasValue)
             {
                 // Fallback to Milliseconds
                 return true;
@@ -296,7 +276,7 @@ public class WorldRecordComponent : IComponent
 
     private TimeSpan? GetPBTime(Model.TimingMethod method)
     {
-        ISegment lastSplit = State.Run.Last();
+        ISegment lastSplit = State.Run[^1];
         TimeSpan? pbTime = lastSplit.PersonalBestSplitTime[method];
         TimeSpan? splitTime = lastSplit.SplitTime[method];
 
@@ -395,14 +375,10 @@ public class WorldRecordComponent : IComponent
             && Settings.BackgroundColor2.A > 0))
         {
             var gradientBrush = new LinearGradientBrush(
-                        new PointF(0, 0),
-                        Settings.BackgroundGradient == GradientType.Horizontal
-                        ? new PointF(width, 0)
-                        : new PointF(0, height),
-                        Settings.BackgroundColor,
-                        Settings.BackgroundGradient == GradientType.Plain
-                        ? Settings.BackgroundColor
-                        : Settings.BackgroundColor2);
+                new PointF(0, 0),
+                Settings.BackgroundGradient == GradientType.Horizontal ? new PointF(width, 0) : new PointF(0, height),
+                Settings.BackgroundColor,
+                Settings.BackgroundGradient == GradientType.Plain ? Settings.BackgroundColor : Settings.BackgroundColor2);
             g.FillRectangle(gradientBrush, 0, 0, width, height);
         }
     }
@@ -426,10 +402,10 @@ public class WorldRecordComponent : IComponent
         else
         {
             InternalComponent.InformationName = "World Record";
-            InternalComponent.AlternateNameText = new[]
-            {
+            InternalComponent.AlternateNameText =
+            [
                 "WR"
-            };
+            ];
             InternalComponent.NameLabel.HorizontalAlignment = StringAlignment.Near;
             InternalComponent.ValueLabel.HorizontalAlignment = StringAlignment.Far;
             InternalComponent.NameLabel.VerticalAlignment =
