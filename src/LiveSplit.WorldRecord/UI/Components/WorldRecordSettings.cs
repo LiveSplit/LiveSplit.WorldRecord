@@ -1,9 +1,8 @@
-﻿using System;
+﻿using LiveSplit.Model;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Xml;
-
-using LiveSplit.Model;
 
 namespace LiveSplit.UI.Components;
 
@@ -101,7 +100,7 @@ public partial class WorldRecordSettings : UserControl
         chkTwoRows_CheckedChanged(null, null);
 
         rdoPrecByLeaderboard.Checked = WRPrecision == WorldRecordPrecisionType.FromLeaderboard;
-        rdoPrecSeconds.Checked = WRPrecision ==  WorldRecordPrecisionType.Seconds;
+        rdoPrecSeconds.Checked = WRPrecision == WorldRecordPrecisionType.Seconds;
         rdoPrecMillis.Checked = WRPrecision == WorldRecordPrecisionType.Milliseconds;
     }
 
